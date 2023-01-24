@@ -94,4 +94,5 @@ if authentication_status:
         HI_trafo_scaled.columns = ["Indicador", "Valor"]
         
         fig = px.line_polar(HI_trafo_scaled, r='Valor', theta='Indicador', line_close=True)
+        fig.update_traces(fill='toself')
         st.plotly_chart(fig)
