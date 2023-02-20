@@ -10,6 +10,7 @@ from streamlit_option_menu import option_menu
 from funciones import  interactive_table
 from st_aggrid import AgGrid, GridUpdateMode
 import plotly.graph_objects as go
+from annotated_text import annotated_text
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 st.set_page_config(page_title="Gestión de activos", page_icon=":bar_chart:")
@@ -96,3 +97,40 @@ if authentication_status:
         fig = px.line_polar(HI_trafo_scaled, r='Valor', theta='Indicador', line_close=True)
         fig.update_traces(fill='toself')
         st.plotly_chart(fig)
+    
+    if menu_select == menu_options[2]:
+        
+
+
+        data_breakers = pd.read_excel("BreakerData.xlsx")
+
+        for k, col in enumerate(data_breakers.columns):
+            if not(("Tipo" in col) or ("Característica" in col)):
+                col_init = k
+                break
+
+        breaker_sel = st.selectbox("Seleccione el interruptor", data_breakers.columns[k:])
+
+        annotated_text(("Celda MV - Interruptor", "", "#faa"))
+        for tipo1 in pd.unique(data_breakers["Tipo1"]):
+            line = "- - - -"
+            annotated_text(line,(tipo1, "", "#fea"))
+            data_temp = data_breakers.loc[data_breakers["Tipo1"] == tipo1, :]
+            for i in pd.unique(data_temp["Tipo2"]):
+                if pd.isna(i):
+                    data_temp2 = data_temp.loc[pd.isna(data_temp["Tipo2"]), :]                    
+                    line = "&emsp;&emsp;&emsp;- - - -"
+                    for k in range(len(data_temp2)):
+                        annotated_text(line,(f"{data_temp2.iloc[k,0]}: ", str(data_temp2[breaker_sel].iloc[k]),"#8ef"))
+                else: 
+                    line = "&emsp;&emsp;&emsp;- - - -"
+                    annotated_text(line,(i, "", "#8ef"))
+                    data_temp2 = data_temp.loc[data_temp["Tipo2"] == i, :]
+
+                    line = '&emsp;&emsp;&emsp;&emsp;&emsp;- - - -'
+                    for k in range(len(data_temp2)):
+                        annotated_text(line,(f"{data_temp2.iloc[k,0]}: ", str(data_temp2[breaker_sel].iloc[k]),"#afa"))
+                    
+
+
+            
